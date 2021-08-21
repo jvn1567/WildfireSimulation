@@ -1,0 +1,10 @@
+city city grass grass grass grass brush brush forest forest
+city city city grass grass grass brush forest forest forest
+city city grass grass dry_grass grass brush forest forest forest
+city grass grass dry_grass dry_grass grass grass brush brush forest
+grass grass grass dry_grass dry_grass grass brush forest river river
+grass grass grass grass brush brush forest river river forest
+brush brush grass grass grass brush river river forest forest
+brush grass grass grass brush river river forest forest brush
+brush grass grass grass river river forest forest brush forest
+forest brush river river river grass grass brush forest forest
