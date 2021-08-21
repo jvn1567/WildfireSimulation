@@ -16,12 +16,12 @@ class TerrainMap():
             self.grid.append([TerrainTile(tiles[i*size + j]) for j in range(0, size)])
 
     def spread_fire(self, row, col):
-        if self.grid[row][col].is_burning():
+        if self.grid[row][col].is_burning:
             self.grid[row][col].burn()
             adjacent = [(row-1, col), (row, col+1), (row+1, col), (row, col-1)]
             for r, c in adjacent:
-                if self.in_bounds(r, c) and not self.grid[r][c].is_burning():
-                    self.grid[r][c].singe()
+                if self.in_bounds(r, c) and not self.grid[r][c].is_burning:
+                    self.grid[r][c].light()
 
 
     def in_bounds(self, row, col):
@@ -36,7 +36,3 @@ class TerrainMap():
             string += '\n'
         string += ']'
         return string
-
-# debug testing
-if __name__ == '__main__':
-    test = TerrainMap('test_map.txt')
