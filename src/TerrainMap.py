@@ -4,16 +4,21 @@ from TerrainTile import TerrainTile
 
 class TerrainMap():
 
-    def __init__(self, mapfile):
-        path = os.getcwd()
-        mapfile = path + '/maps/' + mapfile
-        tiles = []
-        with open(mapfile) as mapfile:
-            tiles = mapfile.read().split()
-        size = int(math.sqrt(len(tiles)))
-        self.grid = []
-        for i in range(0, size):
-            self.grid.append([TerrainTile(tiles[i*size + j]) for j in range(0, size)])
+    def __init__(self, mapfile=None, size=0):
+        if mapfile != None:
+            path = os.getcwd()
+            mapfile = path + '/maps/' + mapfile
+            tiles = []
+            with open(mapfile) as mapfile:
+                tiles = mapfile.read().split()
+            size = int(math.sqrt(len(tiles)))
+            self.grid = []
+            for i in range(0, size):
+                self.grid.append([TerrainTile(tiles[i*size + j]) for j in range(0, size)])
+        else:
+            self.grid = []
+            for i in range(0, size):
+                self.grid.append([TerrainTile('grass') for j in range(0, size)])
 
     def spread_fire(self, row, col):
         if self.grid[row][col].is_burning:

@@ -2,7 +2,7 @@ import random
 
 class TerrainTile():
 
-    TERRAIN_TYPE = {
+    TERRAIN_TYPES = {
         'city': (0, 5000, 35),
         'river': (0, 0, 100),
         'forest': (1000, 10000, 20),
@@ -15,7 +15,7 @@ class TerrainTile():
 
     def __init__(self, type):
         self.type = type
-        self.set_params(*TerrainTile.TERRAIN_TYPE.get(type))
+        self.set_params(*self.TERRAIN_TYPES.get(type))
     
     def set_params(self, moisture, material, resistance):
         self.is_burning = False
