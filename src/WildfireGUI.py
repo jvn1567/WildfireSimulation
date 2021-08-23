@@ -11,8 +11,11 @@ class WildfireGUI(QWidget):
     MENU_WIDTH = 100
     PANEL_XPOS = 500
     PANEL_YPOS = 300
+    MIN_GRID = 10
+    MAX_GRID = 20
     SIM_SPEED = 200
     DEFAULT_MAP = 'test_map.txt'
+    USER_FILE = 'user_custom.txt'
     IMAGE_PATH = os.getcwd() + '/images/'
     WINDOW_TITLE = 'Wildfire Simulator'
     TERRAIN_TYPES = ['City', 'River', 'Forest', 'Dry Forest', 'Brush',
@@ -22,7 +25,7 @@ class WildfireGUI(QWidget):
         super().__init__()
         self.map = TerrainMap(self.DEFAULT_MAP)
         self.set_dimensions()
-        self.create_menus()
+        self.create_menu()
         self.show()
         #sim timer
         self.timer = QTimer()
@@ -35,7 +38,7 @@ class WildfireGUI(QWidget):
         self.setWindowTitle(self.WINDOW_TITLE)
         self.setGeometry(self.PANEL_XPOS, self.PANEL_YPOS, self.width, self.height)
 
-    def create_menus(self):
+    def create_menu(self):
         #layout management
         main_layout = QHBoxLayout()
         spacer_layout = QHBoxLayout()
@@ -45,21 +48,29 @@ class WildfireGUI(QWidget):
         #default actions
         self.click_action = 'Light Fire'
         self.tile_paint = 'city'
-        #create menu items
+        #click action select
         menu_layout.addWidget(QLabel('Action on click:'))
         self.create_rb(menu_layout, click_actions, 'Light Fire', True)
         self.create_rb(menu_layout, click_actions, 'Paint Tile', False)
+        #tile paint select
         menu_layout.addWidget(QLabel('Tile to paint:'))
         tile_select = QComboBox()
         tile_select.addItems(self.TERRAIN_TYPES)
         tile_select.currentIndexChanged.connect(self.set_tile_paint)
         menu_layout.addWidget(tile_select)
+        #new map size select
         menu_layout.addWidget(QLabel('New map size:'))
         size_select = QComboBox()
-        size_select.addItems([str(i) for i in range(10, 21)])
+        size_select.addItems([str(i) for i in range(self.MIN_GRID, self.MAX_GRID+1)])
         size_select.currentIndexChanged.connect(self.set_empty_map)
         menu_layout.addWidget(size_select)
-
+        #save and load
+        btn_save = QPushButton('Save', self)
+        btn_save.clicked.connect(self.save)
+        menu_layout.addWidget(btn_save)
+        btn_load = QPushButton('Load', self)
+        btn_load.clicked.connect(self.load)
+        menu_layout.addWidget(btn_load)
         #finalize
         main_layout.addLayout(spacer_layout)
         main_layout.addLayout(menu_layout)
@@ -81,6 +92,15 @@ class WildfireGUI(QWidget):
 
     def set_empty_map(self, i):
         self.map = TerrainMap(None, int(10 + i))
+        self.set_dimensions()
+        self.update()
+
+    def save(self):
+        with open(self.map.MAP_PATH + self.USER_FILE, 'w') as f:
+            f.write(str(self.map))
+
+    def load(self):
+        self.map = TerrainMap(self.USER_FILE)
         self.set_dimensions()
         self.update()
 

@@ -4,12 +4,11 @@ from TerrainTile import TerrainTile
 
 class TerrainMap():
 
+    MAP_PATH = os.getcwd() + '/maps/'
+
     def __init__(self, mapfile=None, size=0):
         if mapfile != None:
-            path = os.getcwd()
-            mapfile = path + '/maps/' + mapfile
-            tiles = []
-            with open(mapfile) as mapfile:
+            with open(self.MAP_PATH + mapfile) as mapfile:
                 tiles = mapfile.read().split()
             size = int(math.sqrt(len(tiles)))
             self.grid = []
@@ -34,10 +33,9 @@ class TerrainMap():
         return row < size and col < size and row >= 0 and col >= 0
 
     def __str__(self):
-        string = '[\n'
+        string = ''
         for row in range(0, len(self.grid)):
             for col in range(0, len(self.grid)):
                 string = string + str(self.grid[row][col]) + ' '
             string += '\n'
-        string += ']'
         return string
