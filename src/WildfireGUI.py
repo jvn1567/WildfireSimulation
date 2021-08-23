@@ -1,11 +1,18 @@
 import sys
 import os
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from TerrainMap import *
+from TerrainTile import TerrainTile
+from TerrainMap import TerrainMap
+from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import QPainter, QImage
+from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QRadioButton
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QApplication
 
 class WildfireGUI(QWidget):
+    """
+    This class creates a GUI where the user can simulate a wildfire
+    spreading through a location with varying terrain types and also
+    edit the terrain.
+    """
 
     TILE_SIZE = 25
     MENU_WIDTH = 100
@@ -22,6 +29,9 @@ class WildfireGUI(QWidget):
                     'Dry Brush', 'Grass', 'Dry Grass']
 
     def __init__(self):
+        """
+        Constructor for the GUI. Sets up the window and events.
+        """
         super().__init__()
         self.map = TerrainMap(self.DEFAULT_MAP)
         self.set_dimensions()
@@ -33,25 +43,31 @@ class WildfireGUI(QWidget):
         self.timer.start(self.SIM_SPEED)
 
     def set_dimensions(self):
+        """
+        Sets the dimensions of the GUI window according to size of the
+        simulated TerrainMap and predefined parameters.
+        """
         self.width = self.TILE_SIZE*len(self.map.grid) + self.MENU_WIDTH
         self.height = self.TILE_SIZE*len(self.map.grid)
         self.setWindowTitle(self.WINDOW_TITLE)
         self.setGeometry(self.PANEL_XPOS, self.PANEL_YPOS, self.width, self.height)
 
     def create_menu(self):
+        """
+        Creates the user menu on the right of the GUI window.
+        """
         #layout management
         main_layout = QHBoxLayout()
         spacer_layout = QHBoxLayout()
         spacer_layout.addStretch(1)
         menu_layout = QVBoxLayout()
-        click_actions = QButtonGroup(self)
         #default actions
         self.click_action = 'Light Fire'
         self.tile_paint = 'city'
         #click action select
         menu_layout.addWidget(QLabel('Action on click:'))
-        self.create_rb(menu_layout, click_actions, 'Light Fire', True)
-        self.create_rb(menu_layout, click_actions, 'Paint Tile', False)
+        self.create_rb(menu_layout, 'Light Fire', True)
+        self.create_rb(menu_layout, 'Paint Tile', False)
         #tile paint select
         menu_layout.addWidget(QLabel('Tile to paint:'))
         tile_select = QComboBox()
@@ -76,35 +92,73 @@ class WildfireGUI(QWidget):
         main_layout.addLayout(menu_layout)
         self.setLayout(main_layout)
 
-    def create_rb(self, layout, group, name, is_checked):
+    def create_rb(self, layout, name, is_checked):
+        """
+        Creates a single radiobutton with the passed-in name and adds
+        it to the passed-in layout. The radio button will be checked
+        by default if is_checked is passed as true.
+
+        Args:
+            layout (QHBoxLayout): the layout to add the radiobutton to
+            name (string): the radiobutton's option text
+            is_checked (bool): true if the radiobutton is checked by default
+        """
         radiobutton = QRadioButton(name)
         radiobutton.name = name
         radiobutton.setChecked(is_checked)
         radiobutton.toggled.connect(self.set_click_action)
         layout.addWidget(radiobutton)
-        group.addButton(radiobutton)
 
     def set_click_action(self):
+        """
+        Sets a string tag deteriming whether user clicks will light fires
+        or paint tiles when radiobutton options are changed.
+        """
         self.click_action = self.sender().name
 
     def set_tile_paint(self, i):
+        """
+        Sets the TerrainTile type placed when painting tiles to the type
+        selected in the QComboBox dropdown.
+
+        Args:
+            i (int): index of the dropdown menu item selected
+        """
         self.tile_paint = self.TERRAIN_TYPES[i].lower().replace(' ', '_')
 
     def set_empty_map(self, i):
+        """
+        Replaces the current TerrainMap with a new TerrainMap of only grass
+        with the chosen size parameter from the QComboBox.
+
+        Args:
+            i (int): index of the dropdown menu item selected
+        """
         self.map = TerrainMap(None, int(10 + i))
         self.set_dimensions()
         self.update()
 
     def save(self):
+        """
+        Saves the TerrainMap's tile types to a file.
+        """
         with open(self.map.MAP_PATH + self.USER_FILE, 'w') as f:
             f.write(str(self.map))
 
     def load(self):
+        """
+        Loads the last saved TerrainMap from a file.
+        """
         self.map = TerrainMap(self.USER_FILE)
         self.set_dimensions()
         self.update()
 
     def tick(self):
+        """
+        Progress the animation. Each burning tile will have its burn
+        state progressed and attempt to light a fire on the neighboring
+        four tiles.
+        """
         for row in range (0, len(self.map.grid)):
             for col in range (0, len(self.map.grid)):
                 self.map.spread_fire(row, col)
@@ -112,6 +166,12 @@ class WildfireGUI(QWidget):
         self.update()
 
     def paintEvent(self, event):
+        """
+        Redraws the simulation on the window.
+
+        Args:
+            event (event): default positional argument sent by PyQt5, unused
+        """
         qp = QPainter(self)
         for row in range (0, len(self.map.grid)):
             for col in range (0, len(self.map.grid)):
@@ -129,14 +189,20 @@ class WildfireGUI(QWidget):
         qp.end()
 
     def mousePressEvent(self, QMouseEvent):
+        """
+        Attempts to light the tile on fire, or paint a new tile type,
+        depending on the radiobutton option selected.
+
+        Args:
+            QMouseEvent (QMouseEvent): a mouse click event
+        """
         col = int(QMouseEvent.pos().x()/self.TILE_SIZE)
         row = int(QMouseEvent.pos().y()/self.TILE_SIZE)
         if (self.map.in_bounds(row, col)):
             if self.click_action == 'Light Fire':
                 tile = self.map.grid[row][col]
                 if tile.resistance < 100:
-                    while not tile.is_burning:
-                        tile.light()
+                    self.map.grid[row][col].is_burning = True
             else:
                 self.map.grid[row][col] = TerrainTile(self.tile_paint)
             self.update()
