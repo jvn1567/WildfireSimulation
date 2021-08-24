@@ -1,10 +1,14 @@
-city city grass grass grass grass brush brush forest forest 
-city city city grass grass grass brush forest forest forest 
-city city grass grass dry_grass grass brush forest forest forest 
-city grass grass dry_grass dry_grass grass grass brush brush forest 
-grass grass grass dry_grass dry_grass grass brush forest river river 
-grass grass dry_grass dry_grass brush brush forest river river forest 
-brush dry_brush dry_grass dry_grass grass brush river river forest forest 
-brush dry_grass dry_grass dry_grass brush river river forest forest brush 
-brush grass grass grass river river forest forest brush forest 
-forest brush river river river grass grass brush forest forest 
+grass grass grass grass grass grass grass grass grass grass grass grass grass grass 
+grass grass grass grass grass grass grass grass grass grass grass grass grass grass 
+grass grass grass grass grass grass grass grass grass grass grass grass grass grass 
+grass grass grass grass grass grass grass dry_forest dry_forest grass grass grass grass grass 
+grass grass grass grass grass grass grass grass grass grass grass grass grass grass 
+grass grass grass dry_forest grass dry_forest grass grass dry_forest grass grass grass grass grass 
+grass grass grass grass dry_forest grass grass grass grass grass grass grass grass grass 
+grass grass grass grass dry_forest grass grass grass dry_forest grass grass grass grass grass 
+grass grass grass grass grass dry_forest grass grass grass grass grass dry_forest grass grass 
+grass grass grass grass grass grass grass grass grass grass dry_forest grass grass grass 
+grass grass grass grass grass grass grass grass grass dry_forest grass grass grass grass 
+grass grass grass grass grass grass grass grass grass grass grass grass grass grass 
+grass grass grass grass grass grass grass grass grass grass grass grass grass grass 
+grass grass grass grass grass grass grass grass grass grass grass grass grass grass 

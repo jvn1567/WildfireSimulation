@@ -7,6 +7,20 @@ from PyQt5.QtGui import QPainter, QImage
 from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QRadioButton
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QApplication
 
+TERRAIN_TYPES = ['City', 'River', 'Forest', 'Dry Forest', 'Brush',
+                 'Dry Brush', 'Grass', 'Dry Grass']
+TILE_SIZE = 25
+MENU_WIDTH = 100
+PANEL_XPOS = 500
+PANEL_YPOS = 300
+MIN_GRID = 10
+MAX_GRID = 20
+SIM_SPEED = 200
+DEFAULT_MAP = 'test_map.txt'
+USER_FILE = 'user_custom.txt'
+IMAGE_PATH = os.getcwd() + '/images/'
+WINDOW_TITLE = 'Wildfire Simulator'
+
 class WildfireGUI(QWidget):
     """
     This class creates a GUI where the user can simulate a wildfire
@@ -14,43 +28,29 @@ class WildfireGUI(QWidget):
     edit the terrain.
     """
 
-    TILE_SIZE = 25
-    MENU_WIDTH = 100
-    PANEL_XPOS = 500
-    PANEL_YPOS = 300
-    MIN_GRID = 10
-    MAX_GRID = 20
-    SIM_SPEED = 200
-    DEFAULT_MAP = 'test_map.txt'
-    USER_FILE = 'user_custom.txt'
-    IMAGE_PATH = os.getcwd() + '/images/'
-    WINDOW_TITLE = 'Wildfire Simulator'
-    TERRAIN_TYPES = ['City', 'River', 'Forest', 'Dry Forest', 'Brush',
-                    'Dry Brush', 'Grass', 'Dry Grass']
-
     def __init__(self):
         """
         Constructor for the GUI. Sets up the window and events.
         """
         super().__init__()
-        self.map = TerrainMap(self.DEFAULT_MAP)
+        self.map = TerrainMap(DEFAULT_MAP)
         self.set_dimensions()
         self.create_menu()
         self.show()
         #sim timer
         self.timer = QTimer()
         self.timer.timeout.connect(self.tick)
-        self.timer.start(self.SIM_SPEED)
+        self.timer.start(SIM_SPEED)
 
     def set_dimensions(self):
         """
         Sets the dimensions of the GUI window according to size of the
         simulated TerrainMap and predefined parameters.
         """
-        self.width = self.TILE_SIZE*len(self.map.grid) + self.MENU_WIDTH
-        self.height = self.TILE_SIZE*len(self.map.grid)
-        self.setWindowTitle(self.WINDOW_TITLE)
-        self.setGeometry(self.PANEL_XPOS, self.PANEL_YPOS, self.width, self.height)
+        self.width = TILE_SIZE*len(self.map.grid) + MENU_WIDTH
+        self.height = TILE_SIZE*len(self.map.grid)
+        self.setWindowTitle(WINDOW_TITLE)
+        self.setGeometry(PANEL_XPOS, PANEL_YPOS, self.width, self.height)
 
     def create_menu(self):
         """
@@ -71,13 +71,13 @@ class WildfireGUI(QWidget):
         #tile paint select
         menu_layout.addWidget(QLabel('Tile to paint:'))
         tile_select = QComboBox()
-        tile_select.addItems(self.TERRAIN_TYPES)
+        tile_select.addItems(TERRAIN_TYPES)
         tile_select.currentIndexChanged.connect(self.set_tile_paint)
         menu_layout.addWidget(tile_select)
         #new map size select
         menu_layout.addWidget(QLabel('New map size:'))
         size_select = QComboBox()
-        size_select.addItems([str(i) for i in range(self.MIN_GRID, self.MAX_GRID+1)])
+        size_select.addItems([str(i) for i in range(MIN_GRID, MAX_GRID+1)])
         size_select.currentIndexChanged.connect(self.set_empty_map)
         menu_layout.addWidget(size_select)
         #save and load
@@ -124,7 +124,7 @@ class WildfireGUI(QWidget):
         Args:
             i (int): index of the dropdown menu item selected
         """
-        self.tile_paint = self.TERRAIN_TYPES[i].lower().replace(' ', '_')
+        self.tile_paint = TERRAIN_TYPES[i].lower().replace(' ', '_')
 
     def set_empty_map(self, i):
         """
@@ -142,14 +142,14 @@ class WildfireGUI(QWidget):
         """
         Saves the TerrainMap's tile types to a file.
         """
-        with open(self.map.MAP_PATH + self.USER_FILE, 'w') as f:
+        with open(self.map.MAP_PATH + USER_FILE, 'w') as f:
             f.write(str(self.map))
 
     def load(self):
         """
         Loads the last saved TerrainMap from a file.
         """
-        self.map = TerrainMap(self.USER_FILE)
+        self.map = TerrainMap(USER_FILE)
         self.set_dimensions()
         self.update()
 
@@ -175,16 +175,16 @@ class WildfireGUI(QWidget):
         qp = QPainter(self)
         for row in range (0, len(self.map.grid)):
             for col in range (0, len(self.map.grid)):
-                self.point = (self.TILE_SIZE*col, self.TILE_SIZE*row)
+                self.point = (TILE_SIZE*col, TILE_SIZE*row)
                 tile = self.map.grid[row][col]
                 if tile.is_burning:
-                    self.image = self.IMAGE_PATH + str(tile) + 'R.png'
+                    self.image = IMAGE_PATH + str(tile) + 'R.png'
                 elif tile.is_burnt and 'dry_' in str(tile):
-                    self.image = self.IMAGE_PATH + str(tile)[4:] + 'B.png'
+                    self.image = IMAGE_PATH + str(tile)[4:] + 'B.png'
                 elif tile.is_burnt:
-                    self.image = self.IMAGE_PATH + str(tile) + 'B.png'
+                    self.image = IMAGE_PATH + str(tile) + 'B.png'
                 else:
-                    self.image = self.IMAGE_PATH + str(tile) + '.png'
+                    self.image = IMAGE_PATH + str(tile) + '.png'
                 qp.drawImage(*self.point, QImage(self.image))
         qp.end()
 
@@ -196,8 +196,8 @@ class WildfireGUI(QWidget):
         Args:
             QMouseEvent (QMouseEvent): a mouse click event
         """
-        col = int(QMouseEvent.pos().x()/self.TILE_SIZE)
-        row = int(QMouseEvent.pos().y()/self.TILE_SIZE)
+        col = int(QMouseEvent.pos().x()/TILE_SIZE)
+        row = int(QMouseEvent.pos().y()/TILE_SIZE)
         if (self.map.in_bounds(row, col)):
             if self.click_action == 'Light Fire':
                 tile = self.map.grid[row][col]

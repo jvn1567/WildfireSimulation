@@ -1,5 +1,16 @@
 import random
 
+TERRAIN_TYPES = {
+    'city': (0, 5000, 35),
+    'river': (0, 0, 100),
+    'forest': (1000, 10000, 20),
+    'dry_forest': (200, 10000, 5),
+    'brush': (500, 2500, 20),
+    'dry_brush': (0, 2500, 0),
+    'grass': (500, 500, 20),
+    'dry_grass': (0, 500, 0)
+}
+
 class TerrainTile():
     """
     This class represents a terrain tile of a pre-defined type. Terrain
@@ -15,17 +26,6 @@ class TerrainTile():
     which indicate the burn state of the tile.
     """
 
-    TERRAIN_TYPES = {
-        'city': (0, 5000, 35),
-        'river': (0, 0, 100),
-        'forest': (1000, 10000, 20),
-        'dry_forest': (200, 10000, 5),
-        'brush': (500, 2500, 20),
-        'dry_brush': (0, 2500, 0),
-        'grass': (500, 500, 20),
-        'dry_grass': (0, 500, 0)
-    }
-
     def __init__(self, type):
         """
         Constructor for a TerrainTile. Accepts a string indicating the
@@ -36,7 +36,7 @@ class TerrainTile():
             dry_forest, brush, dry_brush, grass, dry_grass)
         """
         self.type = type
-        self.set_params(*self.TERRAIN_TYPES.get(type))
+        self.set_params(*TERRAIN_TYPES.get(type))
     
     def set_params(self, moisture, material, resistance):
         """
